@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:pen="http://www.pentaho.com/schema/pentaho-system"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                           http://www.pentaho.com/schema/pentaho-system http://www.pentaho.com/schema/pentaho-system.xsd">
+
+
+    <!-- Register this Spring ApplicationContext with the PentahoSystem. Without this, publishing beans is not possible. -->
+    <bean class="org.pentaho.platform.engine.core.system.objfac.spring.ApplicationContextPentahoSystemRegisterer" scope="singleton"/>
+
+
+    <bean class="com.pentaho.oem.datasource.TenantedDatasourceService">
+        <!-- This will publish the bean as follows:
+             1. As an implementation of all interfaces in it's inheritance chain.
+             2. As an instance of every super class.
+             3. As an instance of it's own class.
+         -->
+        <pen:publish as-type="ALL">
+            <!-- Give it a higher priority than the default ( 20 )-->
+            <pen:attributes>
+                <pen:attr key="priority" value="30"/>
+            </pen:attributes>
+        </pen:publish>
+    </bean>
+
+    <!-- Capture the default as a bean to re-use in our delegating proxy later. Most objects have a default priority
+         of 20, IUserRoleListService happens to be 50 -->
+    <pen:bean id="delegate" class="org.pentaho.platform.api.engine.IUserRoleListService">
+        <pen:attributes>
+            <pen:attr key="priority" value="50"/>
+        </pen:attributes>
+    </pen:bean>
+
+    <bean class="com.pentaho.oem.proxies.ExtraRolesUserRoleListService">
+
+        <!-- inject the bean to delegate to (default implementation) -->
+        <constructor-arg ref="delegate"/>
+
+        <pen:publish as-type="INTERFACES">
+            <!-- Give it a higher priority than the default ( built-in ExtraRolesUserRoleListService is 50 )-->
+            <pen:attributes>
+                <pen:attr key="priority" value="60"/>
+            </pen:attributes>
+        </pen:publish>
+    </bean>
+</beans>
+
