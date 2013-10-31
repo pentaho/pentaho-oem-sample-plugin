@@ -9,3 +9,5 @@ registering itself as an implementation with a higher than default priority (20)
 2. ExtraRolesUserRoleListService is a more sophesticated example showing how you can wrap the built-in implementation with
 a class to decorate the built-in's behaviors. This example adds a custom role to the physical list from the built-in
 implementation.
+3. MyAction is an example of an ABS Action being supplied by a plugin.
+4. MyService is a plugin REST service utilizing the MyAction permission
